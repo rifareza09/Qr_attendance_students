@@ -16,6 +16,14 @@ class ValidateIP
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // If testing mode is enabled, skip IP validation
+        if (config('attendance.testing_mode')) {
+            // Generate random IP for testing to simulate different devices
+            $randomIp = '192.168.' . rand(1, 254) . '.' . rand(1, 254);
+            $request->merge(['client_ip' => $randomIp]);
+            return $next($request);
+        }
+
         $ip = NetworkValidator::getClientIP();
 
         // Validate IP format

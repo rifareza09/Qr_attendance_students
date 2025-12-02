@@ -49,6 +49,47 @@ Sistem absensi mahasiswa berbasis QR Code dengan fitur keamanan tinggi, validasi
 
 ## 🚀 Quick Start
 
+**Untuk instalasi lengkap step-by-step, lihat [INSTALLATION.md](INSTALLATION.md)**
+
+### Quick Installation
+
+```bash
+# 1. Clone repository
+git clone https://github.com/rifareza09/Qr_attendance_students.git
+cd Qr_attendance_students
+
+# 2. Install dependencies
+composer install
+npm install
+
+# 3. Setup environment
+cp .env.example .env
+php artisan key:generate
+
+# 4. Generate encryption key
+php -r "echo bin2hex(random_bytes(32));"
+# Copy output ke ENCRYPTION_KEY di .env
+
+# 5. Configure database di .env
+# Update DB_HOST, DB_DATABASE, DB_USERNAME, DB_PASSWORD
+
+# 6. Run migrations & seeders
+php artisan migrate --seed
+
+# 7. Run application
+php artisan serve
+# Akses: http://localhost:8000
+```
+
+**Default Admin:** `admin` / `admin123`
+
+---
+
+## 📖 Documentation
+
+- **[Installation Guide](INSTALLATION.md)** - Panduan instalasi lengkap
+- **[Setup Guide](SETUP.md)** - Konfigurasi dan deployment
+
 ### 1️⃣ Install Dependencies
 
 ```bash

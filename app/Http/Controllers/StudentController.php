@@ -14,10 +14,11 @@ class StudentController extends Controller
     /**
      * Display student registration page
      */
-    public function index()
+    public function index(Request $request)
     {
         $networkInfo = NetworkValidator::getNetworkInfo();
-        $ip = NetworkValidator::getClientIP();
+        // Use client_ip from middleware (supports testing mode with random IPs)
+        $ip = $request->client_ip ?? NetworkValidator::getClientIP();
 
         // Check if student already exists
         $existingStudent = Student::where('student_ip', $ip)->first();
@@ -34,7 +35,8 @@ class StudentController extends Controller
             'student_name' => 'required|string|max:255',
         ]);
 
-        $ip = NetworkValidator::getClientIP();
+        // Use client_ip from middleware (supports testing mode with random IPs)
+        $ip = $request->client_ip ?? NetworkValidator::getClientIP();
         $name = $request->student_name;
 
         // Check if already registered

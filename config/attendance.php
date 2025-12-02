@@ -19,6 +19,16 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Testing Mode
+    |--------------------------------------------------------------------------
+    | When enabled, IP address checking will be disabled to allow
+    | multiple registrations from the same device for testing purposes.
+    | WARNING: Always set to false in production!
+    */
+    'testing_mode' => env('TESTING_MODE', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Session Settings
     |--------------------------------------------------------------------------
     */

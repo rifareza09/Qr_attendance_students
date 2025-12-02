@@ -6,13 +6,15 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\SettingController;
 
-// Student Routes
-Route::get('/', [StudentController::class, 'index'])->name('student.index');
-Route::post('/register', [StudentController::class, 'register'])->name('student.register');
-Route::get('/scan-qr', [StudentController::class, 'showScanQr'])->name('student.scan-qr');
-Route::post('/scan-qr', [AttendanceController::class, 'scanQr'])->name('attendance.scan');
-Route::post('/mark-attendance', [AttendanceController::class, 'mark'])->name('attendance.mark');
-Route::get('/dashboard/{id}', [StudentController::class, 'dashboard'])->name('student.dashboard');
+// Student Routes (with IP validation middleware)
+Route::middleware('App\Http\Middleware\ValidateIP')->group(function () {
+    Route::get('/', [StudentController::class, 'index'])->name('student.index');
+    Route::post('/register', [StudentController::class, 'register'])->name('student.register');
+    Route::get('/scan-qr', [StudentController::class, 'showScanQr'])->name('student.scan-qr');
+    Route::post('/scan-qr', [AttendanceController::class, 'scanQr'])->name('attendance.scan');
+    Route::post('/mark-attendance', [AttendanceController::class, 'mark'])->name('attendance.mark');
+    Route::get('/dashboard/{id}', [StudentController::class, 'dashboard'])->name('student.dashboard');
+});
 
 // Admin Routes
 Route::prefix('admin')->name('admin.')->group(function () {

@@ -14,7 +14,8 @@ class AttendanceController extends Controller
      */
     public function mark(Request $request)
     {
-        $ip = NetworkValidator::getClientIP();
+        // Use client_ip from middleware (supports testing mode with random IPs)
+        $ip = $request->client_ip ?? NetworkValidator::getClientIP();
 
         // Mark attendance by IP
         $result = AttendanceService::markByIP($ip);
@@ -35,7 +36,8 @@ class AttendanceController extends Controller
             'qr_code' => 'required|string',
         ]);
 
-        $ip = NetworkValidator::getClientIP();
+        // Use client_ip from middleware (supports testing mode with random IPs)
+        $ip = $request->client_ip ?? NetworkValidator::getClientIP();
         $qrCode = $request->qr_code;
 
         $result = AttendanceService::markWithQR($qrCode, $ip);
@@ -60,7 +62,8 @@ class AttendanceController extends Controller
             'qr_code' => 'required|string',
         ]);
 
-        $ip = NetworkValidator::getClientIP();
+        // Use client_ip from middleware (supports testing mode with random IPs)
+        $ip = $request->client_ip ?? NetworkValidator::getClientIP();
         $qrCode = $request->qr_code;
 
         $result = AttendanceService::markWithQR($qrCode, $ip);
