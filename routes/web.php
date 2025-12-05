@@ -36,8 +36,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/logout', [AdminController::class, 'logout'])->name('logout');
 
         // Student management
+        Route::get('/students/{id}/view', [AdminController::class, 'viewStudent'])->name('students.view');
         Route::get('/students/{id}/edit', [AdminController::class, 'editStudent'])->name('students.edit');
         Route::put('/students/{id}', [AdminController::class, 'updateStudent'])->name('students.update');
+        Route::delete('/students/{id}', [AdminController::class, 'deleteStudent'])->name('students.delete');
         Route::post('/students/{id}/toggle', [AdminController::class, 'deactivateStudent'])->name('students.toggle');
         Route::get('/students/{id}/credentials', [AdminController::class, 'viewCredentials'])->name('students.credentials');
 

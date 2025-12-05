@@ -161,37 +161,6 @@ class AdminController extends Controller
     }
 
     /**
-     * Edit student
-     */
-    public function editStudent($id)
-    {
-        $student = Student::findOrFail($id);
-        return view('admin.edit-student', compact('student'));
-    }
-
-    /**
-     * Update student
-     */
-    public function updateStudent(Request $request, $id)
-    {
-        $request->validate([
-            'student_name' => 'required|string|max:255',
-            'student_ip' => 'required|ip|unique:students,student_ip,' . $id,
-        ]);
-
-        $student = Student::findOrFail($id);
-        $student->update($request->only('student_name', 'student_ip'));
-
-        activity()
-            ->causedBy(Auth::user())
-            ->performedOn($student)
-            ->log('Student updated');
-
-        return redirect()->route('admin.dashboard', ['tab' => 'students'])
-            ->with('success', 'Student updated successfully');
-    }
-
-    /**
      * Deactivate student
      */
     public function deactivateStudent($id)
@@ -325,6 +294,102 @@ class AdminController extends Controller
         }
 
         return back()->with('error', $result['message'] ?? 'Failed to generate QR code');
+    }
+
+    /**
+     * View student details
+     */
+    public function viewStudent($id)
+    {
+        $student = Student::findOrFail($id);
+        $attendances = Attendance::where('student_id', $id)
+            ->orderBy('attendance_date', 'desc')
+            ->orderBy('attendance_time', 'desc')
+            ->get();
+
+        activity()
+            ->causedBy(Auth::user())
+            ->performedOn($student)
+            ->log('Viewed student details');
+
+        return view('admin.students.view', compact('student', 'attendances'));
+    }
+
+    /**
+     * Show edit student form
+     */
+    public function editStudent($id)
+    {
+        $student = Student::findOrFail($id);
+
+        return view('admin.students.edit', compact('student'));
+    }
+
+    /**
+     * Update student information
+     */
+    public function updateStudent(Request $request, $id)
+    {
+        $student = Student::findOrFail($id);
+
+        $request->validate([
+            'student_name' => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:students,username,' . $id,
+            'student_ip' => 'required|ip|unique:students,student_ip,' . $id,
+            'password' => 'nullable|string|min:6|confirmed',
+            'is_active' => 'required|boolean',
+        ]);
+
+        $data = [
+            'student_name' => $request->student_name,
+            'username' => $request->username,
+            'student_ip' => $request->student_ip,
+            'is_active' => $request->is_active,
+        ];
+
+        // Update password if provided
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($request->password);
+        }
+
+        $student->update($data);
+
+        activity()
+            ->causedBy(Auth::user())
+            ->performedOn($student)
+            ->withProperties([
+                'old' => $student->getOriginal(),
+                'new' => $student->toArray()
+            ])
+            ->log('Updated student information');
+
+        return redirect()
+            ->route('admin.students.view', $student->id)
+            ->with('success', 'Student information updated successfully!');
+    }
+
+    /**
+     * Delete student
+     */
+    public function deleteStudent($id)
+    {
+        $student = Student::findOrFail($id);
+        $studentName = $student->student_name;
+
+        activity()
+            ->causedBy(Auth::user())
+            ->performedOn($student)
+            ->withProperties([
+                'student' => $student->toArray()
+            ])
+            ->log('Deleted student');
+
+        // Delete student (cascade will delete related records)
+        $student->delete();
+
+        return redirect()
+            ->route('admin.dashboard', ['tab' => 'students'])
+            ->with('success', "Student '{$studentName}' has been deleted successfully!");
     }
 
     /**
